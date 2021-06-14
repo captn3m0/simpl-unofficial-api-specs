@@ -5,6 +5,10 @@ info:
   summary: 'An unofficial specification for the [Simpl](https://www.getsimpl.com/) API'
   license:
     name: MIT
+    identifier: MIT
+  contact:
+    name: Nemo
+    url: 'https://captnemo.in/contact'
 servers:
   - url: 'https://bff.getsimpl.com'
     description: Production
@@ -138,14 +142,11 @@ paths:
                   - success
               examples:
                 success:
-                  value: |-
-                    {
-                      "api_version": 1,
-                      "data": {
-                        "verification_id": "aa5cf58f-f223-4163-9b39-43cb31e11ad3"
-                      },
-                      "success": true
-                    }
+                  value:
+                    api_version: 1
+                    data:
+                      verification_id: aa5cf58f-f223-4163-9b39-43cb31e11ad3
+                    success: true
                 bad-request:
                   value:
                     api_version: 1
@@ -1174,3 +1175,6 @@ components:
       type: apiKey
       in: header
       description: Access Token that is returned in the "Verify OTP" request.
+tags:
+  - name: Data
+  - name: Authentication

@@ -1,0 +1,10 @@
+# Hides the generation timestamp when files are generated.
+hideGenerationTimestamp: true
+packageName: simpl
+packageVersion: 0.0.1
+projectName: simpl-api
+# when accessing unset attribute, return `None` instead of raising `ApiAttributeError` (Default: false)
+pythonAttrNoneIfUnset: true
+gitRepoId: simpl-py
+gitUserId: captn3m0
+httpUserAgent: Simpl-Py/{packageVersion}
