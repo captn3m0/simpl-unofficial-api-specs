@@ -1,0 +1,1176 @@
+openapi: 3.1.0
+info:
+  title: Simpl API
+  version: '1.0'
+  summary: 'An unofficial specification for the [Simpl](https://www.getsimpl.com/) API'
+  license:
+    name: MIT
+servers:
+  - url: 'https://bff.getsimpl.com'
+    description: Production
+paths:
+  /api/v1/signin/otp:
+    post:
+      summary: Get OTP
+      operationId: get-otp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                verification_type:
+                  type: string
+                  minLength: 1
+                flow:
+                  type: string
+                  minLength: 1
+                phone_number:
+                  type: string
+                  minLength: 1
+                device_data:
+                  type: object
+                  properties:
+                    platform:
+                      type: string
+                      minLength: 1
+                  required:
+                    - platform
+              required:
+                - verification_type
+                - flow
+                - phone_number
+                - device_data
+              x-examples:
+                example-1:
+                  verification_type: PHONE_NUMBER
+                  flow: LOGIN_FLOW
+                  phone_number: '9458113956'
+                  device_data:
+                    platform: ios
+          application/xml:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  verification_type: PHONE_NUMBER
+                  flow: LOGIN_FLOW
+                  phone_number: '9458113956'
+                  device_data:
+                    platform: ixos
+              properties:
+                verification_type:
+                  type: string
+                  minLength: 1
+                  enum:
+                    - PHONE_NUMBER
+                  example: PHONE_NUMBER
+                  description: Only "PHONE_NUMBER" is supported
+                flow:
+                  type: string
+                  minLength: 1
+                  enum:
+                    - LOGIN_FLOW
+                  example: LOGIN_FLOW
+                  description: '"LOGIN_FLOW"'
+                phone_number:
+                  type: string
+                  minLength: 10
+                  pattern: '\d{10}'
+                  maxLength: 10
+                  example: '9999112233'
+                  description: 10 digit mobile phone number
+                device_data:
+                  type: object
+                  required:
+                    - platform
+                  properties:
+                    platform:
+                      type: string
+                      minLength: 1
+                      description: Mobile Platform.
+                      enum:
+                        - ios
+                        - android
+                      example: ios
+              required:
+                - verification_type
+                - flow
+                - phone_number
+                - device_data
+        description: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    api_version: 1
+                    data:
+                      verification_id: aa5cf58f-f223-4163-9b39-43cb31e11ad3
+                    success: true
+                properties:
+                  api_version:
+                    type: number
+                    description: Usually just 1
+                  data:
+                    type: object
+                    properties:
+                      verification_id:
+                        type: string
+                        minLength: 1
+                        format: uuid
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    description: List of errors in the request
+                    items:
+                      type: string
+                required:
+                  - api_version
+                  - success
+              examples:
+                success:
+                  value: |-
+                    {
+                      "api_version": 1,
+                      "data": {
+                        "verification_id": "aa5cf58f-f223-4163-9b39-43cb31e11ad3"
+                      },
+                      "success": true
+                    }
+                bad-request:
+                  value:
+                    api_version: 1
+                    errors:
+                      - bad_request
+                    success: false
+      description: 'Trigger a login and send OTP to the user''s phone. '
+      tags:
+        - Authentication
+      parameters: []
+  /api/v3/signin/otp/verify:
+    post:
+      summary: Verify OTP
+      operationId: verify-otp
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    api_version: '1.0'
+                    data:
+                      access_token: 6f0e0fe3b204d8ac43baf8c016feabd7
+                      access_token_id: null
+                      billbox_status: ACTIVE
+                      onboarding: null
+                      should_onboard: false
+                      upi_verification_onboarding: null
+                      user:
+                        activated: true
+                        approval_category: null
+                        approval_subcategory: null
+                        authorized: true
+                        can_login_and_transact: true
+                        created_at: '2016-08-20T17:08:40.367Z'
+                        deleted_at: null
+                        email: getsimpl@captnemo.in
+                        email_verified: true
+                        first_name: Capt
+                        id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        last_name: Nemo
+                        password_digest: $2a$10$wzujTqFaHOOgwrLMVjlaYeWZG3MH4kXR/FjnmIjVdMpwv02usYjKS
+                        phone_number: '9458113956'
+                        phone_number_verified: true
+                        referrer_id: 2f31557b-937a-433f-8f27-9d75dce374fd
+                        updated_at: '2019-05-12T20:28:51.221Z'
+                        user_configuration:
+                          activated_for_pay_in_3: null
+                          alpha_enabled: null
+                          automated_upi_request_allowed: false
+                          created_at: '2017-08-22T08:43:28.541Z'
+                          emandate_allowed_for_user: false
+                          emandate_enabled_by_user: false
+                          flow_id: ''
+                          grace_period_enabled: true
+                          id: 550f349c-3e2c-4f87-8f68-3158277cd718
+                          transaction_authorized: true
+                          updated_at: '2020-11-02T12:32:44.232Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        vpa_address: nemo@upi
+                    success: true
+                properties:
+                  api_version:
+                    type: string
+                    minLength: 1
+                  data:
+                    type:
+                      - object
+                      - 'null'
+                    required:
+                      - access_token
+                      - billbox_status
+                      - should_onboard
+                      - user
+                    properties:
+                      access_token:
+                        type: string
+                        minLength: 1
+                      access_token_id: {}
+                      billbox_status:
+                        type: string
+                        minLength: 1
+                      onboarding: {}
+                      should_onboard:
+                        type: boolean
+                      upi_verification_onboarding: {}
+                      user:
+                        type: object
+                        required:
+                          - activated
+                          - authorized
+                          - can_login_and_transact
+                          - created_at
+                          - email
+                          - email_verified
+                          - first_name
+                          - id
+                          - last_name
+                          - password_digest
+                          - phone_number
+                          - phone_number_verified
+                          - referrer_id
+                          - updated_at
+                          - user_configuration
+                          - vpa_address
+                        properties:
+                          activated:
+                            type: boolean
+                          approval_category: {}
+                          approval_subcategory: {}
+                          authorized:
+                            type: boolean
+                          can_login_and_transact:
+                            type: boolean
+                          created_at:
+                            type: string
+                            minLength: 1
+                          deleted_at: {}
+                          email:
+                            type: string
+                            minLength: 1
+                          email_verified:
+                            type: boolean
+                          first_name:
+                            type: string
+                            minLength: 1
+                          id:
+                            type: string
+                            minLength: 1
+                          last_name:
+                            type: string
+                            minLength: 1
+                          password_digest:
+                            type: string
+                            minLength: 1
+                          phone_number:
+                            type: string
+                            minLength: 1
+                          phone_number_verified:
+                            type: boolean
+                          referrer_id:
+                            type: string
+                            minLength: 1
+                          updated_at:
+                            type: string
+                            minLength: 1
+                          user_configuration:
+                            type: object
+                            required:
+                              - automated_upi_request_allowed
+                              - created_at
+                              - emandate_allowed_for_user
+                              - emandate_enabled_by_user
+                              - flow_id
+                              - grace_period_enabled
+                              - id
+                              - transaction_authorized
+                              - updated_at
+                              - user_id
+                            properties:
+                              activated_for_pay_in_3: {}
+                              alpha_enabled: {}
+                              automated_upi_request_allowed:
+                                type: boolean
+                              created_at:
+                                type: string
+                                minLength: 1
+                              emandate_allowed_for_user:
+                                type: boolean
+                              emandate_enabled_by_user:
+                                type: boolean
+                              flow_id:
+                                type: string
+                              grace_period_enabled:
+                                type: boolean
+                              id:
+                                type: string
+                                minLength: 1
+                              transaction_authorized:
+                                type: boolean
+                              updated_at:
+                                type: string
+                                minLength: 1
+                              user_id:
+                                type: string
+                                minLength: 1
+                          vpa_address:
+                            type: string
+                            minLength: 1
+                  success:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                  error:
+                    type:
+                      - string
+                      - 'null'
+                required:
+                  - data
+                  - success
+      tags:
+        - Authentication
+      description: Verify OTP. Returns `access_code`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              properties:
+                verification_type:
+                  type: string
+                  minLength: 1
+                flow:
+                  type: string
+                  minLength: 1
+                otp_code:
+                  type: string
+                  minLength: 1
+                phone_number:
+                  type: string
+                  minLength: 1
+                verification_id:
+                  type: string
+                  minLength: 1
+                unique_device_id:
+                  type: string
+                  minLength: 1
+              required:
+                - verification_type
+                - flow
+                - otp_code
+                - phone_number
+                - verification_id
+                - unique_device_id
+              x-examples:
+                example-1:
+                  verification_type: PHONE_NUMBER
+                  flow: LOGIN_FLOW
+                  otp_code: '5149'
+                  phone_number: '9458113956'
+                  verification_id: c7856e70-3da8-46bd-999c-273805662451
+                  unique_device_id: FB875824-06A3-4EEF-9FAF-6A803A479DB4
+  /api/v2/transactions:
+    post:
+      summary: Get Transactions
+      operationId: get-transactions
+      tags:
+        - Data
+      description: Returns list of transactions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  page: 1
+                  per_page: 15
+              properties:
+                page:
+                  type: number
+                  minimum: 1
+                per_page:
+                  type: number
+                  maximum: 100
+                  minimum: 1
+              required:
+                - page
+                - per_page
+        description: Set page number and number of transactions per page.
+      security:
+        - access-token: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    api_version: '1.0'
+                    data:
+                      page: 1
+                      per_page: 15
+                      total_pages: 26
+                      transactions:
+                        - amount_in_paise: 96965
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-06-09T14:28:30Z'
+                          created_at: '2021-06-09T14:28:30Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 7ff5c567-4df8-4949-a0bd-c9974655c3d0
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          merchant_order_id: ZTD-21-8046B97C807EE
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: CLAIMED
+                          updated_at: '2021-06-09T14:28:30Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 31995
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-06-05T16:52:29Z'
+                          created_at: '2021-06-05T16:52:29Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 91c8dda6-2fb2-430b-8fbc-c901b14ce6a9
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          merchant_order_id: ZTD-21-BF36458AB7F1E
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: CLAIMED
+                          updated_at: '2021-06-05T16:52:29Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 39887
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-06-04T08:00:44Z'
+                          created_at: '2021-06-04T08:00:44Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 751ec91d-f9e0-4d35-923e-f287d3179195
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          merchant_order_id: ZTD-21-D45A405B2B6DE
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: CLAIMED
+                          updated_at: '2021-06-04T08:00:44Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 51100
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-06-03T07:58:26Z'
+                          created_at: '2021-06-03T07:58:26Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Box8
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 9e208481-61d0-4120-b3f0-aba4e9628bdd
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: e8305bf2-1814-4593-b4e8-81d0156e047f
+                            name: Box8
+                          merchant_id: e8305bf2-1814-4593-b4e8-81d0156e047f
+                          merchant_order_id: BX88214031622707106068
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: CLAIMED
+                          updated_at: '2021-06-03T07:58:26Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 523759
+                          category: USER_TRANSACTION
+                          claimed_at: ''
+                          created_at: '2021-06-03T06:17:47Z'
+                          display:
+                            metadata:
+                              payment_method_type: Card
+                              payment_processor_transaction_id: getsimpl-042d59a9b0c0e970-1
+                              payment_reference_id: 042d59a9b0c0e970
+                            subtitle: null
+                            title: Paid to Simpl
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 894a5924-8ca7-4ccf-b1ab-66ecd57d3365
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant_id: null
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: SETTLEMENT
+                          updated_at: '2021-06-03T06:17:47Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 141420
+                          category: USER_TRANSACTION
+                          claimed_at: ''
+                          created_at: '2021-06-01T15:51:22Z'
+                          display:
+                            metadata: null
+                            subtitle: Refund
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 46d8f946-d0e0-49ed-90d1-5e47cb61ce45
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions:
+                            - amount_in_paise: 141420
+                              category: USER_TRANSACTION
+                              claimed_at: '2021-06-01T14:36:29Z'
+                              created_at: '2021-06-01T14:36:29Z'
+                              display:
+                                metadata: null
+                                subtitle: null
+                                title: Zomato
+                              hide_transaction_amount: false
+                              id: 16cfc666-e0b5-4a11-8ffe-072d2d3b3464
+                              status: CLAIMED
+                              updated_at: '2021-06-01T14:36:29Z'
+                          status: REFUND
+                          updated_at: '2021-06-01T15:51:22Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 141420
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-06-01T14:36:29Z'
+                          created_at: '2021-06-01T14:36:29Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 16cfc666-e0b5-4a11-8ffe-072d2d3b3464
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          merchant_order_id: ZTD-21-78AF38A6DD95A
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions:
+                            - amount_in_paise: 141420
+                              category: USER_TRANSACTION
+                              claimed_at: ''
+                              created_at: '2021-06-01T15:51:22Z'
+                              display:
+                                metadata: null
+                                subtitle: Refund
+                                title: Zomato
+                              hide_transaction_amount: false
+                              id: 46d8f946-d0e0-49ed-90d1-5e47cb61ce45
+                              status: REFUND
+                              updated_at: '2021-06-01T15:51:22Z'
+                          status: CLAIMED
+                          updated_at: '2021-06-01T14:36:29Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 43445
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-06-01T06:20:36Z'
+                          created_at: '2021-06-01T06:20:36Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 2de55cc5-4eff-4020-9758-7a98b417a86a
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          merchant_order_id: ZTD-21-C93427A84F540
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: CLAIMED
+                          updated_at: '2021-06-01T06:20:36Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 72470
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-05-31T15:29:09Z'
+                          created_at: '2021-05-31T15:29:09Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: ee992f05-292c-4783-98de-8fa2e26b38f8
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          merchant_order_id: ZTD-21-858932E87ECFE
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: CLAIMED
+                          updated_at: '2021-05-31T15:29:09Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 21100
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-05-31T09:56:38Z'
+                          created_at: '2021-05-31T09:56:38Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Box8
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 0d8d291e-fd0d-4b3c-a121-9bbedbf5d401
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: e8305bf2-1814-4593-b4e8-81d0156e047f
+                            name: Box8
+                          merchant_id: e8305bf2-1814-4593-b4e8-81d0156e047f
+                          merchant_order_id: BX88214031622454997972
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: CLAIMED
+                          updated_at: '2021-05-31T09:56:38Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 13715
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-05-30T15:57:07Z'
+                          created_at: '2021-05-30T15:57:07Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 93b5954f-3cc8-4d55-b0f9-2e8faece6550
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          merchant_order_id: ZTD-21-450F5CC51141B
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: CLAIMED
+                          updated_at: '2021-05-30T15:57:07Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 12945
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-05-26T07:45:57Z'
+                          created_at: '2021-05-26T07:45:57Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: a6eaf8c2-8d3e-41c0-9199-f3a1458a9b12
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          merchant_order_id: ZTD-21-FF8CD7B1FFC51
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: CLAIMED
+                          updated_at: '2021-05-26T07:45:57Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 29494
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-05-25T06:43:56Z'
+                          created_at: '2021-05-25T06:43:56Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: bb81265e-f140-41be-aa57-85ffbaa0e648
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          merchant_order_id: ZTD-21-E6C03F59EED3F
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions: null
+                          status: CLAIMED
+                          updated_at: '2021-05-25T06:43:56Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 22636
+                          category: USER_TRANSACTION
+                          claimed_at: ''
+                          created_at: '2021-05-24T15:13:54Z'
+                          display:
+                            metadata: null
+                            subtitle: Refund
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 99439fef-8f9b-4589-840a-79f5996ca013
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions:
+                            - amount_in_paise: 70795
+                              category: USER_TRANSACTION
+                              claimed_at: '2021-05-24T13:44:08Z'
+                              created_at: '2021-05-24T13:44:08Z'
+                              display:
+                                metadata: null
+                                subtitle: null
+                                title: Zomato
+                              hide_transaction_amount: false
+                              id: 6c82dfa5-0a99-409f-84b8-2d171f51c1d5
+                              status: CLAIMED
+                              updated_at: '2021-05-24T13:44:08Z'
+                          status: REFUND
+                          updated_at: '2021-05-24T15:13:54Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                        - amount_in_paise: 70795
+                          category: USER_TRANSACTION
+                          claimed_at: '2021-05-24T13:44:08Z'
+                          created_at: '2021-05-24T13:44:08Z'
+                          display:
+                            metadata: null
+                            subtitle: null
+                            title: Zomato
+                          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+                          hide_transaction_amount: false
+                          id: 6c82dfa5-0a99-409f-84b8-2d171f51c1d5
+                          issuer:
+                            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+                            name: Simpl
+                          merchant:
+                            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                            name: Zomato
+                          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+                          merchant_order_id: ZTD-21-FD04192D0F908
+                          product:
+                            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+                            name: Simpl Pay Later
+                          related_transactions:
+                            - amount_in_paise: 22636
+                              category: USER_TRANSACTION
+                              claimed_at: ''
+                              created_at: '2021-05-24T15:13:54Z'
+                              display:
+                                metadata: null
+                                subtitle: Refund
+                                title: Zomato
+                              hide_transaction_amount: false
+                              id: 99439fef-8f9b-4589-840a-79f5996ca013
+                              status: REFUND
+                              updated_at: '2021-05-24T15:13:54Z'
+                          status: CLAIMED
+                          updated_at: '2021-05-24T13:44:08Z'
+                          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+                    success: true
+                properties:
+                  api_version:
+                    type: string
+                    minLength: 1
+                    maxLength: 3
+                    pattern: \d\.\d
+                    example: '1.0'
+                  data:
+                    type: object
+                    required:
+                      - page
+                      - per_page
+                      - total_pages
+                      - transactions
+                    properties:
+                      page:
+                        type: number
+                        minimum: 1
+                        maximum: 1000
+                        multipleOf: 1
+                      per_page:
+                        type: number
+                        minimum: 1
+                        maximum: 100
+                        multipleOf: 1
+                      total_pages:
+                        type: number
+                        minimum: 1
+                        maximum: 1000
+                        multipleOf: 1
+                      transactions:
+                        type: array
+                        uniqueItems: true
+                        minItems: 1
+                        maxItems: 100
+                        items:
+                          $ref: '#/components/schemas/Transaction'
+                  success:
+                    type: boolean
+                required:
+                  - api_version
+                  - data
+                  - success
+components:
+  schemas:
+    Transaction:
+      description: Transaction Schema
+      type: object
+      x-examples:
+        example-1:
+          amount_in_paise: 141420
+          category: USER_TRANSACTION
+          claimed_at: '2021-06-01T14:36:29Z'
+          created_at: '2021-06-01T14:36:29Z'
+          display:
+            metadata: null
+            subtitle: null
+            title: Zomato
+          gateway_id: 5747b214-9a55-427a-82cc-49bc29106bb1
+          hide_transaction_amount: false
+          id: 16cfc666-e0b5-4a11-8ffe-072d2d3b3464
+          issuer:
+            id: 3b608ffe-c55d-4d74-be49-1c040ea25400
+            name: Simpl
+          merchant:
+            id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+            name: Zomato
+          merchant_id: 3a97cc43-df4d-4c2b-932f-dd57906b8024
+          merchant_order_id: ZTD-21-78AF38A6DD95A
+          product:
+            id: a21b31b4-74b8-4a6e-a2a8-28b85d1f8315
+            name: Simpl Pay Later
+          related_transactions:
+            - amount_in_paise: 141420
+              category: USER_TRANSACTION
+              claimed_at: ''
+              created_at: '2021-06-01T15:51:22Z'
+              display:
+                metadata: null
+                subtitle: Refund
+                title: Zomato
+              hide_transaction_amount: false
+              id: 46d8f946-d0e0-49ed-90d1-5e47cb61ce45
+              status: REFUND
+              updated_at: '2021-06-01T15:51:22Z'
+          status: CLAIMED
+          updated_at: '2021-06-01T14:36:29Z'
+          user_id: 656c59ec-83bc-48b0-80db-87e172a4d8c2
+      properties:
+        amount_in_paise:
+          type: number
+          multipleOf: 1
+          minimum: 1
+          maximum: 9900000
+        category:
+          type: string
+          minLength: 1
+          enum:
+            - USER_TRANSACTION
+            - CASHBACK
+          example: USER_TRANSACTION
+        claimed_at:
+          type: string
+          minLength: 1
+          format: date-time
+        created_at:
+          type: string
+          minLength: 1
+          format: date-time
+        display:
+          type: object
+          required:
+            - title
+          properties:
+            metadata:
+              anyOf:
+                - type: object
+                - type: 'null'
+                  properties: {}
+            subtitle:
+              type:
+                - string
+                - 'null'
+            title:
+              type: string
+              minLength: 1
+        gateway_id:
+          type: string
+          minLength: 1
+          format: uuid
+        hide_transaction_amount:
+          type: boolean
+        id:
+          type: string
+          minLength: 1
+          format: uuid
+        issuer:
+          type: object
+          properties:
+            id:
+              type: string
+              minLength: 1
+              format: uuid
+            name:
+              type: string
+              minLength: 1
+              description: Usually "Simpl"
+        merchant:
+          type: object
+          properties:
+            id:
+              type: string
+              minLength: 1
+              format: uuid
+            name:
+              type: string
+              minLength: 1
+        merchant_id:
+          type:
+            - string
+            - 'null'
+          minLength: 1
+          format: uuid
+        merchant_order_id:
+          type: string
+          minLength: 1
+        product:
+          type: object
+          properties:
+            id:
+              type: string
+              minLength: 1
+            name:
+              type: string
+              minLength: 1
+        status:
+          type: string
+          minLength: 1
+          enum:
+            - CLAIMED
+            - REFUND
+            - SETTLEMENT
+          example: CLAIMED
+        updated_at:
+          type: string
+          minLength: 1
+          format: date-time
+        user_id:
+          type: string
+          minLength: 1
+          format: uuid
+        related_transactions:
+          type:
+            - array
+            - 'null'
+          maxItems: 2
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/Related-Transaction'
+      required:
+        - amount_in_paise
+        - category
+        - claimed_at
+        - created_at
+        - display
+        - gateway_id
+        - hide_transaction_amount
+        - id
+        - status
+        - updated_at
+    Related-Transaction:
+      description: A mini-representation of a related transaction
+      type: object
+      x-examples:
+        example-1:
+          amount_in_paise: 141420
+          category: USER_TRANSACTION
+          claimed_at: '2021-06-01T14:36:29Z'
+          created_at: '2021-06-01T14:36:29Z'
+          display:
+            metadata: null
+            subtitle: null
+            title: Zomato
+          hide_transaction_amount: false
+          id: 16cfc666-e0b5-4a11-8ffe-072d2d3b3464
+          status: CLAIMED
+          updated_at: '2021-06-01T14:36:29Z'
+      properties:
+        amount_in_paise:
+          type: number
+          multipleOf: 1
+          maximum: 9900000
+          minimum: 1
+        category:
+          type: string
+          minLength: 1
+          enum:
+            - USER_TRANSACTION
+            - CASHBACK
+          example: USER_TRANSACTION
+        claimed_at:
+          type: string
+          minLength: 1
+          format: date-time
+        created_at:
+          type: string
+          minLength: 1
+          format: date-time
+        display:
+          type: object
+          required:
+            - title
+          properties:
+            metadata:
+              type: 'null'
+            subtitle:
+              type:
+                - 'null'
+                - string
+            title:
+              type: string
+              minLength: 1
+        hide_transaction_amount:
+          type: boolean
+          description: Usually false
+        id:
+          type: string
+          minLength: 1
+          format: uuid
+        status:
+          type: string
+          minLength: 1
+          enum:
+            - CLAIMED
+            - REFUNDED
+          example: CLAIMED
+        updated_at:
+          type: string
+          minLength: 1
+          format: date-time
+      required:
+        - amount_in_paise
+        - category
+        - claimed_at
+        - created_at
+        - display
+        - hide_transaction_amount
+        - id
+        - status
+        - updated_at
+  securitySchemes:
+    access-token:
+      name: Access-Token
+      type: apiKey
+      in: header
+      description: Access Token that is returned in the "Verify OTP" request.
