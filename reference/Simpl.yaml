@@ -9,6 +9,7 @@ info:
   contact:
     name: Nemo
     url: 'https://captnemo.in/contact'
+  description: 'Simpl API, reverse-engineered from the iOS application.'
 servers:
   - url: 'https://bff.getsimpl.com'
     description: Production
